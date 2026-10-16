@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لعبة المافيا</title>
+<style>
+:root{color-scheme:light;--bg:#f5f3ee;--card:#fff;--tx:#1d1d1f;--mu:#6b6b70;--ac:#b3261e;--ac2:#fff;--bd:#e0ddd5;--ok:#1b7f4b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#141416;--card:#1f1f23;--tx:#f1f1f3;--mu:#9a9aa2;--ac:#e5534b;--ac2:#fff;--bd:#33333a;--ok:#4cc38a}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#141416;--card:#1f1f23;--tx:#f1f1f3;--mu:#9a9aa2;--ac:#e5534b;--ac2:#fff;--bd:#33333a;--ok:#4cc38a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;min-height:100vh}
+#app{max-width:480px;margin:0 auto;padding:20px 16px 40px;text-align:center}
+h1{font-size:28px;margin:8px 0}h2{font-size:22px;margin:12px 0}
+p{color:var(--mu);line-height:1.7;margin:6px 0 14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px;margin:12px 0}
+button{font:inherit;cursor:pointer}
+.btn{display:block;width:100%;background:var(--ac);color:var(--ac2);border:0;border-radius:12px;padding:14px;font-size:17px;font-weight:600;margin:10px 0}
+.btn.sec{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+.btn:disabled{opacity:.4}
+.row{display:flex;justify-content:space-between;align-items:center;width:100%;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:13px 14px;margin:8px 0;font-size:17px}
+.row.sel{border-color:var(--ac);outline:2px solid var(--ac)}
+.badge{background:var(--ac);color:var(--ac2);border-radius:99px;min-width:26px;padding:2px 9px;font-size:14px}
+.in{display:flex;gap:8px}
+input{flex:1;font:inherit;font-size:17px;padding:12px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);min-width:0}
+.add{background:var(--ac);color:var(--ac2);border:0;border-radius:12px;padding:0 18px;font-size:22px}
+.x{background:none;border:0;color:var(--mu);font-size:20px}
+.seg{display:flex;gap:8px;justify-content:center}
+.seg button{flex:1;padding:12px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-size:18px}
+.seg button.on{background:var(--ac);color:var(--ac2);border-color:var(--ac)}
+.big{font-size:64px;margin:6px 0}
+.name{font-size:30px;font-weight:700;color:var(--ac);margin:8px 0}
+.dead{opacity:.45;text-decoration:line-through}
+.chip{display:inline-block;margin:3px;padding:5px 11px;border:1px solid var(--bd);border-radius:99px;background:var(--card);font-size:14px}
+.good{color:var(--ok)}.bad{color:var(--ac)}
+body{background:radial-gradient(120% 60% at 50% 0%,color-mix(in srgb,var(--ac) 16%,var(--bg)),var(--bg) 70%) no-repeat,var(--bg)}
+#app{padding:32px 20px 56px;display:flex;flex-direction:column;gap:6px;min-height:100vh}
+#app>*{animation:up .35s ease both}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+h1{font-size:32px;margin:14px 0 8px;letter-spacing:-.5px}
+h2{font-size:24px;margin:18px 0 8px}
+p{margin:8px 0 20px;font-size:16px}
+.card{padding:26px 20px;margin:18px 0;border-radius:22px;box-shadow:0 8px 28px rgba(0,0,0,.08)}
+.row{padding:17px 18px;margin:10px 0;border-radius:16px;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,.05);transition:transform .12s,border-color .12s}
+.row:active{transform:scale(.98)}
+.btn{padding:17px;margin:22px 0 6px;border-radius:16px;font-size:18px;box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 35%,transparent)}
+.btn.sec{box-shadow:none;margin-top:10px}
+.btn:active{transform:scale(.98)}
+.in{margin:14px 0 18px;gap:10px}
+input{padding:15px;border-radius:16px;font-size:18px}
+.add{padding:0 22px;border-radius:16px}
+.seg{gap:12px}.seg button{padding:15px;border-radius:14px;font-weight:700}
+.big{font-size:76px;margin:20px 0 12px}
+.name{font-size:36px;margin:14px 0 10px}
+.chip{margin:5px;padding:8px 14px;font-size:15px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const $=document.getElementById('app');
+const R={m:{n:'مافيا',e:'🔪',d:'اقتلوا المواطنين كل ليلة من غير ما ينكشف أمركم.'},
+c:{n:'مواطن',e:'🧑',d:'ما عندك قدرة خاصة. ناقش وصوّت لطرد المافيا.'},
+d:{n:'دكتور',e:'🩺',d:'كل ليلة تحمي شخصاً (ممكن نفسك) من القتل.'},
+s:{n:'شيخ',e:'📿',d:'كل ليلة تسأل عن شخص: هل هو مافيا أم لا؟'}};
+let names=[],mc=1,P=[],round=1,N={},sel=null,idx=0;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rnd=n=>{const b=new Uint32Array(1);crypto.getRandomValues(b);return b[0]%n};
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const alive=()=>P.map((p,i)=>i).filter(i=>P[i].alive);
+const ui=h=>{$.innerHTML=h;window.scrollTo(0,0)};
+
+function setup(){
+ const minP=1;
+ ui(`<h1>🎭 لعبة المافيا</h1><p>أضف أسماء اللاعبين، واختر عدد المافيا.</p>
+ <div class="in"><input id="nm" placeholder="اسم اللاعب" maxlength="20" onkeydown="if(event.key==='Enter')addN()"><button class="add" onclick="addN()">+</button></div>
+ <div style="margin-top:10px">${names.map((n,i)=>`<div class="row"><span>${esc(n)}</span><button class="x" onclick="delN(${i})">✕</button></div>`).join('')}</div>
+ <div class="card"><b>عدد المافيا</b><div class="seg" style="margin-top:10px">${[1,2,3].map(k=>`<button class="${k==mc?'on':''}" onclick="mc=${k};setup()">${k}</button>`).join('')}</div>
+ <p style="margin-bottom:0">الكروت: مافيا، دكتور، شيخ، والباقي مواطنين.</p></div>
+ <button class="btn" ${names.length<minP?'disabled':''} onclick="start()">ابدأ اللعبة (${names.length})</button>`);
+}
+function addN(){const v=document.getElementById('nm').value.trim();if(v&&!names.includes(v))names.push(v);setup();document.getElementById('nm').focus()}
+function delN(i){names.splice(i,1);setup()}
+
+function start(){
+ const roles=[...Array(Math.min(mc,Math.max(1,names.length-1))).fill('m'),'d','s'];
+ while(roles.length<names.length)roles.push('c');
+ roles.length=names.length;
+ shuffle(roles);
+ P=shuffle(names.map((n,i)=>({name:n,role:roles[i],alive:true})));
+ round=1;idx=0;handoff(0,()=>showRole(0));
+}
+function handoff(i,fn,sub){
+ window._f=fn;
+ ui(`<div class="big">📱</div><h2>أعطِ الهاتف إلى</h2><div class="name">${esc(P[i].name)}</div><p>${sub||'لا يشوف أحد الشاشة غيره.'}</p><button class="btn" onclick="_f()">أنا ${esc(P[i].name)}، متابعة</button>`);
+}
+function showRole(i){
+ const r=R[P[i].role];
+ ui(`<p>${esc(P[i].name)}، أنت:</p><div class="card"><div class="big">${r.e}</div><h1 class="bad">${r.n}</h1><p>${r.d}</p>${P[i].role==='m'&&mc>1?`<p>زملاؤك: ${P.filter((p,j)=>p.role==='m'&&j!==i).map(p=>esc(p.name)).join('، ')}</p>`:''}</div>
+ <button class="btn" onclick="nextReveal(${i})">فهمت، إخفاء</button>`);
+}
+function nextReveal(i){
+ if(i+1<P.length)handoff(i+1,()=>showRole(i+1));
+ else ui(`<div class="big">🌙</div><h2>الكل عرف كرته</h2><p>اعطِ الهاتف لمن يدير اللعبة. الليل بدأ، الجميع يغمض عينيه.</p><button class="btn" onclick="night()">ابدأ الليل</button>`);
+}
+
+function table(list,fn,badge){
+ return list.map(i=>`<button class="row" onclick="${fn}(${i})"><span>${esc(P[i].name)}</span>${badge?badge(i):''}</button>`).join('');
+}
+function night(){
+ if(win())return end(win());
+ N={q:[],v:{},save:null,qi:0};
+ N.q=shuffle(alive());
+ step();
+}
+function step(){
+ if(N.qi>=N.q.length)return morning();
+ const i=N.q[N.qi],role=P[i].role;
+ handoff(i,()=>act(i));
+}
+function act(i){
+ const role=P[i].role;
+ if(role==='m'){
+  const t=alive().filter(j=>P[j].role!=='m');
+  ui(`<h2>🔪 صوّت على من تقتل</h2><p>${esc(P[i].name)}، اضغط على اسم الضحية.</p>${table(t,'vote',j=>N.v[j]?`<span class="badge">${N.v[j]}</span>`:'')}`);
+ }else if(role==='d'){
+  ui(`<h2>🩺 من تحمي الليلة؟</h2><p>ممكن تحمي نفسك.</p>${table(alive(),'save')}`);
+ }else if(role==='c'){
+  ui(`<h2>🌙 اختر أي شخص</h2><p>اضغط على أي اسم ثم أكمل.</p>${table(alive().filter(j=>j!==i),'skip')}`);
+ }else{
+  ui(`<h2>📿 عن من تسأل؟</h2>${table(alive().filter(j=>j!==i),'ask')}`);
+ }
+}
+function vote(j){N.v[j]=(N.v[j]||0)+1;N.qi++;
+ // show updated tally to next mafia voter via act; move on
+ step()}
+function skip(){N.qi++;step()}
+function save(j){N.save=j;N.qi++;step()}
+function ask(j){
+ const m=P[j].role==='m';
+ ui(`<h2>${esc(P[j].name)}</h2><div class="big">${m?'🔪':'✅'}</div><h1 class="${m?'bad':'good'}">${m?'مافيا':'ليس مافيا'}</h1><button class="btn" onclick="N.qi++;step()">فهمت، إخفاء</button>`);
+}
+function win(){
+ const a=alive().filter(i=>P[i].role==='m').length,o=alive().length-a;
+ if(a===0)return 'c';if(a>=o)return 'm';return null;
+}
+function morning(){
+ const mx=Math.max(...Object.values(N.v));
+ const top=Object.keys(N.v).filter(k=>N.v[k]===mx).map(Number);
+ const t=top[rnd(top.length)];
+ let msg;
+ if(t===N.save)msg=`<div class="big">🩺</div><h2 class="good">الدكتور أنقذ الضحية!</h2><p>ما مات أحد هذه الليلة.</p>`;
+ else{P[t].alive=false;msg=`<div class="big">💀</div><h2 class="bad">قُتل ${esc(P[t].name)}</h2><p>كان ${R[P[t].role].n}.</p>`;}
+ ui(`<h1>☀️ الصباح — الراوند ${round}</h1><div class="card">${msg}</div>${status()}<button class="btn" onclick="afterMorning()">متابعة</button>`);
+}
+function status(){return `<div>${P.map(p=>`<span class="chip ${p.alive?'':'dead'}">${esc(p.name)}</span>`).join('')}</div>`}
+function afterMorning(){const w=win();if(w)return end(w);sel=null;day()}
+function day(){
+ ui(`<h2>🗣️ وقت النقاش</h2><p>ناقشوا، ثم اختاروا من تطردونه بالتصويت.</p>${table(alive(),'pick',null)}<button class="btn sec" onclick="pick(-1)">تخطي (ما حدا يُطرد)</button><button class="btn" ${sel===null?'disabled':''} onclick="kick()">تأكيد الطرد</button>`);
+ if(sel!==null&&sel>=0){[...document.querySelectorAll('.row')].forEach((b,k)=>{if(alive()[k]===sel)b.classList.add('sel')})}
+}
+function pick(j){if(j===-1){sel=-1;return kick()}sel=j;day()}
+function kick(){
+ let msg;
+ if(sel===-1)msg=`<h2>ما أحد طُرد</h2>`;
+ else{P[sel].alive=false;msg=`<div class="big">⚖️</div><h2 class="bad">طُرد ${esc(P[sel].name)}</h2><p>كان ${R[P[sel].role].n}.</p>`;}
+ const w=win();
+ ui(`<div class="card">${msg}</div>${status()}<button class="btn" onclick="${w?`end('${w}')`:'nextRound()'}">${w?'النتيجة':'ابدأ الراوند '+(round+1)}</button>`);
+}
+function nextRound(){round++;night()}
+function end(w){
+ ui(`<div class="big">${w==='m'?'🔪':'🏆'}</div><h1 class="${w==='m'?'bad':'good'}">${w==='m'?'فازت المافيا!':'فاز المواطنون!'}</h1>
+ <div class="card">${P.map(p=>`<div class="row" style="margin:4px 0"><span class="${p.alive?'':'dead'}">${esc(p.name)}</span><span>${R[p.role].e} ${R[p.role].n}</span></div>`).join('')}</div>
+ <button class="btn" onclick="start()">لعبة جديدة بنفس اللاعبين</button><button class="btn sec" onclick="setup()">تغيير اللاعبين / عدد المافيا</button>`);
+}
+setup();
+</script>
+</body>
+</html>
